@@ -35,7 +35,8 @@ class TodoControllerTest {
         // given
         long todoId = 1L;
         String title = "title";
-        AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
+        String nickname = "nickname";
+        AuthUser authUser = new AuthUser(1L, "email",nickname, UserRole.USER);
         User user = User.fromAuthUser(authUser);
         UserResponse userResponse = new UserResponse(user.getId(), user.getEmail());
         TodoResponse response = new TodoResponse(
@@ -61,7 +62,7 @@ class TodoControllerTest {
     @Test
     void todo_단건_조회_시_todo가_존재하지_않아_예외가_발생한다() throws Exception {
         // given
-        long todoId = 1L;
+        long todoId = 100L;
 
         // when
         when(todoService.getTodo(todoId))
@@ -69,9 +70,9 @@ class TodoControllerTest {
 
         // then
         mockMvc.perform(get("/todos/{todoId}", todoId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(HttpStatus.OK.name()))
-                .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("Todo not found"));
     }
 }
