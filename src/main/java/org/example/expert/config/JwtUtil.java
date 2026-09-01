@@ -1,8 +1,8 @@
 package org.example.expert.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
@@ -40,18 +39,35 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Long userId, String email, String nickname ,UserRole userRole) {
+    public String createToken
+            (Long userId, String email, String nickname ,UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
-                Jwts.builder().subject(String.valueOf(userId))
+                Jwts.builder()
+                        .subject(String.valueOf(userId))
                         .claim("email", email)
-                        .claim("userRole", userRole)
                         .claim("nickname", nickname)
+                        .claim("userRole", userRole)
                         .expiration(new Date(date.getTime() + tokenTime))
                         .issuedAt(date) // 발급일
                         .signWith(key)
                         .compact();
+    }
+
+    public boolean validateToken(String token) {
+
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+
+        try {
+            extractClaims(token);
+            return true;
+        }catch (JwtException e) {
+            return false;
+        }
+
     }
 
     public String substringToken(String tokenValue) {
@@ -61,11 +77,28 @@ public class JwtUtil {
         throw new ServerException("Not Found Token");
     }
 
-    public Claims extractClaims(String token) {
+    private Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    public Long getUserId(String token) {
+        return Long.parseLong(extractClaims(token).getSubject());
+    }
+
+    public String extractUserEmail(String token) {
+        return extractClaims(token).get("email").toString();
+    }
+
+    public String extractUserNickname(String token) {
+        return extractClaims(token).get("nickname").toString();
+    }
+
+    public String extractUserRole(String token) {
+        return extractClaims(token).get("userRole").toString();
+    }
+
 }
