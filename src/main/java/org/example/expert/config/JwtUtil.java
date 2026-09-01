@@ -16,6 +16,8 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 @Slf4j(topic = "JwtUtil")
 @Component
 public class JwtUtil {
@@ -28,8 +30,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private SecretKey key;
+    //private Key key;
+    //private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
@@ -41,14 +44,13 @@ public class JwtUtil {
         Date date = new Date();
 
         return BEARER_PREFIX +
-                Jwts.builder()
-                        .setSubject(String.valueOf(userId))
+                Jwts.builder().subject(String.valueOf(userId))
                         .claim("email", email)
                         .claim("userRole", userRole)
                         .claim("nickname", nickname)
-                        .setExpiration(new Date(date.getTime() + tokenTime))
-                        .setIssuedAt(date) // 발급일
-                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
+                        .expiration(new Date(date.getTime() + tokenTime))
+                        .issuedAt(date) // 발급일
+                        .signWith(key)
                         .compact();
     }
 
@@ -60,10 +62,10 @@ public class JwtUtil {
     }
 
     public Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
