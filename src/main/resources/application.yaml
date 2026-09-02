@@ -35,3 +35,11 @@ server:
 jwt:
   secret: "h61HwLrWre0+1jRCk6AU8vMx/0p2Okkxg+moMo1rSAM="
   expiration: 3600000  # 1시간 (ms)
+
+#logging:
+#  level:
+#    root: info
+#    # Spring Web 요청(DispatcherServlet 등) 라우팅 상세 분석
+#    org.springframework.web.servlet: debug
+#    # Spring Security 필터 체인 및 권한 거부(Access Denied) 추적
+#    org.springframework.security: debug
