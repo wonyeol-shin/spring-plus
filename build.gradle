@@ -24,33 +24,45 @@ repositories {
 }
 
 dependencies {
+    // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // data jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // socket
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Database
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // bcrypt
+    // Encryption & Token
     implementation 'at.favre.lib:bcrypt:0.10.2'
-
-    // jwt
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
 
-    // queryDsl
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    // QueryDSL (OpenFeign 보안 취약점 패치 버전)
+    implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.10.1'
+    annotationProcessor "io.github.openfeign.querydsl:querydsl-apt:6.10.1:jpa" // 끝에 :jpa가 반드시 붙어야 합니다!
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-    // security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
